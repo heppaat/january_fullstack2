@@ -52,7 +52,7 @@ const fetchData = async () => {
   const countryContent = validatedData
     .map(
       (country) =>
-        `<p>${country.name} has a population of: ${country.population}</p><button id="${country.id}" class="deleteButton btn btn-primary">DELETE</button><button id="${country.id}" class="patchButton">PATCH</button>`
+        `<p>${country.name} has a population of: ${country.population}</p><button id="${country.id}delete" class="deleteButton btn btn-primary">DELETE</button><button id="${country.id}patch" class="patchButton btn btn-secondary">PATCH</button>`
     )
     .join("");
 
@@ -63,7 +63,7 @@ const fetchData = async () => {
 
   [...deleteButtons].forEach((button) =>
     button.addEventListener("click", async () => {
-      await deleteData(button.id);
+      await deleteData(button.id.split("delete")[0]);
       fetchData();
     })
   );
@@ -72,7 +72,7 @@ const fetchData = async () => {
 
   [...patchButtons].forEach((button) =>
     button.addEventListener("click", async () => {
-      await patchData(button.id);
+      await patchData(button.id.split("patch")[0]);
       fetchData();
     })
   );
