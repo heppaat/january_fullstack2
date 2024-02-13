@@ -7,10 +7,18 @@ const CountrySchema = z.object({
   population: z.number(),
 });
 
-//set up query params
+//set up query params for GET
 const minElement = document.getElementById("min") as HTMLInputElement;
 const maxElement = document.getElementById("max") as HTMLInputElement;
 const searchButton = document.getElementById("search") as HTMLButtonElement;
+
+//get elements for PATCH
+const patchName = document.getElementById("patchName") as HTMLInputElement;
+const patchPopulation = document.getElementById(
+  "patchPopulation"
+) as HTMLInputElement;
+
+// GETDATA from server
 
 const fetchData = async () => {
   if (!minElement.value) {
@@ -75,7 +83,8 @@ const fetchData = async () => {
 minElement.addEventListener("input", fetchData);
 maxElement.addEventListener("input", fetchData);
 
-//POST
+//POSTDATA to server
+
 const countryInput = document.getElementById("nameInput") as HTMLInputElement;
 const populationInput = document.getElementById(
   "populationInput"
@@ -114,7 +123,7 @@ postButton.addEventListener("click", async () => {
   fetchData();
 });
 
-//DELETE
+//DELETEDATA from server
 
 const deleteData = async (id: string) => {
   let response = null;
@@ -137,12 +146,7 @@ const deleteData = async (id: string) => {
   alert("Success");
 };
 
-//PATCH
-
-const patchName = document.getElementById("patchName") as HTMLInputElement;
-const patchPopulation = document.getElementById(
-  "patchPopulation"
-) as HTMLInputElement;
+//PATCHDATA on server
 
 const patchData = async (id: string) => {
   let response = null;
@@ -160,9 +164,9 @@ const patchData = async (id: string) => {
   //if no internet, network error
   if (response === null) return alert("network error");
 
-  //client error? - not implemented
+  //client error
   if (response.status >= 400 && response.status < 500)
-    return alert("Client error");
+    return alert("Invalid body input");
 
   //if server has error
   if (response.status >= 500) return alert("server error");
