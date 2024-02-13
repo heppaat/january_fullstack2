@@ -44,7 +44,7 @@ const fetchData = async () => {
   const countryContent = validatedData
     .map(
       (country) =>
-        `<p>${country.name} has a population of: ${country.population}</p><button id="${country.id}" class="deleteButton, btn btn-primary h-[2rem]">DELETE</button>`
+        `<p>${country.name} has a population of: ${country.population}</p><button id="${country.id}" class="deleteButton btn btn-primary">DELETE</button><button id="${country.id}" class="patchButton">PATCH</button>`
     )
     .join("");
 
@@ -56,6 +56,15 @@ const fetchData = async () => {
   [...deleteButtons].forEach((button) =>
     button.addEventListener("click", async () => {
       await deleteData(button.id);
+      fetchData();
+    })
+  );
+
+  const patchButtons = document.getElementsByClassName("patchButton");
+
+  [...patchButtons].forEach((button) =>
+    button.addEventListener("click", async () => {
+      await patchData(button.id);
       fetchData();
     })
   );
@@ -78,7 +87,7 @@ const postData = async () => {
 
   try {
     response = await fetch("http://localhost:4001/api/countries", {
-      method: "post",
+      method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name: countryInput.value,
@@ -107,13 +116,11 @@ postButton.addEventListener("click", async () => {
 
 //DELETE
 
-//get buttons
-
 const deleteData = async (id: string) => {
   let response = null;
   try {
     response = await fetch(`http://localhost:4001/api/countries/${id}`, {
-      method: "delete",
+      method: "DELETE",
     });
   } catch (error) {}
 
@@ -131,4 +138,34 @@ const deleteData = async (id: string) => {
 };
 
 //PATCH
-//homework
+
+const patchName = document.getElementById("patchName") as HTMLInputElement;
+const patchPopulation = document.getElementById(
+  "patchPopulation"
+) as HTMLInputElement;
+
+const patchData = async (id: string) => {
+  let response = null;
+  try {
+    response = await fetch(`http://localhost:4001/api/countries/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: patchName.value,
+        population: +patchPopulation.value,
+      }),
+    });
+  } catch (error) {}
+
+  //if no internet, network error
+  if (response === null) return alert("network error");
+
+  //client error? - not implemented
+  if (response.status >= 400 && response.status < 500)
+    return alert("Client error");
+
+  //if server has error
+  if (response.status >= 500) return alert("server error");
+
+  alert("Success");
+};
