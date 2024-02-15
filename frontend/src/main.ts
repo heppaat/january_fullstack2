@@ -18,6 +18,29 @@ const patchPopulation = document.getElementById(
   "patchPopulation"
 ) as HTMLInputElement;
 
+//get mainDIV and save /cancel buttons for MODIFY/PATCH
+const patchDiv = document.getElementById("modifyDiv") as HTMLDivElement;
+const saveButton = document.getElementById("save") as HTMLButtonElement;
+const cancelButton = document.getElementById("cancel") as HTMLButtonElement;
+
+const hideModifyPatchWindow = () => {
+  patchDiv.style.display = "none";
+};
+cancelButton.addEventListener("click", hideModifyPatchWindow);
+
+const showModifyPatchWindow = () => {
+  patchDiv.style.display = "flex";
+};
+
+//global variable for save buttonId
+let saveButtonId: number | null = null;
+
+saveButton.addEventListener("click", async () => {
+  await patchData();
+  hideModifyPatchWindow();
+  fetchData();
+});
+
 // GETDATA from server
 
 const fetchData = async () => {
@@ -70,10 +93,19 @@ const fetchData = async () => {
 
   const patchButtons = document.getElementsByClassName("patchButton");
 
+  //what happens when you click on PATCH/MODIFY button?
+
   [...patchButtons].forEach((button) =>
     button.addEventListener("click", async () => {
-      await patchData(button.id.split("patch")[0]);
-      fetchData();
+      showModifyPatchWindow();
+      saveButtonId = +button.id.split("patch")[0];
+      patchName.value = validatedData.find(
+        (country) => country.id === saveButtonId
+      )!.name;
+      patchPopulation.value =
+        "" +
+        validatedData.find((country) => country.id === saveButtonId)!
+          .population;
     })
   );
 };
@@ -148,17 +180,20 @@ const deleteData = async (id: string) => {
 
 //PATCHDATA on server
 
-const patchData = async (id: string) => {
+const patchData = async () => {
   let response = null;
   try {
-    response = await fetch(`http://localhost:4001/api/countries/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: patchName.value,
-        population: +patchPopulation.value,
-      }),
-    });
+    response = await fetch(
+      `http://localhost:4001/api/countries/${saveButtonId}`,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: patchName.value,
+          population: +patchPopulation.value,
+        }),
+      }
+    );
   } catch (error) {}
 
   //if no internet, network error
