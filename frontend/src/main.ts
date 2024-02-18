@@ -208,3 +208,52 @@ const patchData = async () => {
 
   alert("Success");
 };
+
+//--------------ABSZTRAKCIO--------------------------
+
+//ABSZTRAKCIO FETCH FUNKCIORA AMIT MINDEN METHODNAL HASZNALHATNANK
+const safeFetch = async (url: string, method: string, data?: any) => {
+  let response = null;
+  try {
+    (response = await fetch(url)),
+      {
+        method: method,
+        headers: data ? { "Content-Type": "application/json" } : {},
+        body: data ? JSON.stringify(data) : undefined,
+      };
+  } catch (error) {}
+
+  //if no internet, network error
+  if (response === null) return alert("network error");
+
+  //client error
+  if (response.status >= 400 && response.status < 500)
+    return alert("Invalid body input");
+
+  //if server has error
+  if (response.status >= 500) return alert("server error");
+
+  alert("Success");
+};
+
+//____-_______----PATCH ABSZTRAKCIOVAL--------_______-_______
+
+const patchDataAbstraction = async () => {
+  safeFetch(`http://localhost:4001/api/countries/${saveButtonId}`, "PATCH", {
+    name: patchName.value,
+    population: +patchPopulation.value,
+  });
+};
+
+const deleteDataAbstraction = async (id: string) => {
+  safeFetch(`http://localhost:4001/api/countries/${id}`, "DELETE");
+};
+
+const postDataAbstraction = async () => {
+  safeFetch("http://localhost:4001/api/countries", "POST", {
+    name: countryInput.value,
+    population: +populationInput.value,
+  });
+};
+
+const fetchDataAbstraction = async () => {};
